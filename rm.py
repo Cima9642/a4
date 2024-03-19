@@ -1,52 +1,63 @@
 import os
-import sys
 import shutil
+import sys
 
+#Trash Path
+#CHANGE THIS PATH BEFORE SUBMITTING
+TRASH_DIR = os.path.expanduser("~/rm_trash")
+recursive = False
 
-
-def apender(directory):
-    files = os.listdir(directory)
-    counter = {}
+def increment_filename(file_name):
     
-    for file in files:
-        name, extension = os.path.splitext(file)
+    #Check if the file name exist in trash
+    if not os.path.exists(os.path.join(TRASH_DIR, file_name)):
+        return file_name    
+    #File name splitter
+    name, extension = os.path.splitext(file_name)
+    counter = 1
+    #While loop to increment counter until a unique name is found
+    while True:
+        new_filename = name + "-" + str(counter) + extension
+        if not os.path.exists(os.path.join(TRASH_DIR, new_filename)):
+            return new_filename
+        counter += 1
+
+def move_to_trash(path):
+    #Does the path point to a file?
+    file_name = os.path.basename(path)
+    new_filename = increment_filename(file_name)
+    
+    if os.path.isfile(path):
+        #Increase file name and move to trash
+        shutil.move(path, os.path.join(TRASH_DIR, new_filename))
+    #Check if path points to a directory
+    elif os.path.isdir(file_name):
+        #Error Printer and change directories  
+        shutil.move(file_name, os.path.join(TRASH_DIR, new_filename))
+    #Satisfies no conditions, print    
+    else:
+        print("rm.py: cannot remove " + path  + ": No such file or directory", file=sys.stderr) 
+
+def main():
+    #Trash doesn't exist? Make one
+    if not os.path.exists(TRASH_DIR):
+        os.makedirs(TRASH_DIR)
+
+    #Recursion Stuff
+    recursive = False
+    args = sys.argv[1:]
+    if "-r" in args:
+        recursive = True
+        args.remove("-r")    
         
-        if "-" in name[-2:]:
-            base_name, counter = name.rsplit('-', 1)
-            if count.isdigit():
-                count = int(count)
-            else:
-                count = 1
-                base_name = name
+   #Trash arg mover
+    for path in args:
+        if recursive:
+            move_to_trash(path)
+        elif os.path.isfile(path):
+            move_to_trash(path)
         else:
-            count = 0
-            base_name = name
-        
-        #Increment counter for the base name test
-        counter[base_name] = counter.get(base_name, count) + 1
-        
-        #New file formatter
-        name_after = "{}-{}{}".format(base_name, counter[base_name], extension)
-        
-        #File path builder
-        prev_path = os.path.join(directory, file)
-        new_path = os.path.join(directory, name_after)
-        
-        #Renaminator
-        shutil.move(prev_path, new_path)
-        #TESTER DELETE AFTER USE, FIGURE OUT HOW TO EXACTLY RUN IT FUCKER
-        #print("Renamed file '{}' to '{}'".format(file, name_after)) 
-    path_getter = sys.argv[1:]
-    
-    #FunkyTown
-    des_dir = os.path.expanduser("~/rm_trash")
-    
-    
-        
-        
-        
-        
-        
-        
-        
-        
+            print("rm.py: cannot remove " + path + ": Is a directory", file=sys.stderr) 
+            
+if __name__ == "__main__":
+    main()
