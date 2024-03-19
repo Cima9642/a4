@@ -22,7 +22,7 @@ def apender(directory):
             count = 0
             base_name = name
         
-        #Increment counter for the base name
+        #Increment counter for the base name test
         counter[base_name] = counter.get(base_name, count) + 1
         
         #New file formatter
