@@ -9,7 +9,7 @@ recursive = False
 
 def increment_filename(file_name):
     
-    #Check if the file name exist in trash
+    #Check if the file name exist in trash#
     if not os.path.exists(os.path.join(TRASH_DIR, file_name)):
         return file_name    
     #File name splitter
